@@ -59,7 +59,7 @@ function renderComponent(Component, props, options) {
         Component._renderCachePrefix = Component._renderCachePrefix || Component.displayName || uuid.v1();
     }
 
-    var cache = options.cache;
+    var cache = options && options.cache;
     var cacheKey = cache && hasCache ? Component._renderCachePrefix + instance.getCacheKey() : null;
 
     if (cacheKey && cache.has(cacheKey)) {
