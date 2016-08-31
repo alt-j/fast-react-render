@@ -1,5 +1,7 @@
 var ATTRS_TYPES = ['string', 'boolean', 'number'];
 
+var uuid = require('uuid');
+
 var extend = require('./utils/extend');
 
 var escapeHtml = require('./utils/escape/html');
@@ -13,54 +15,68 @@ var dasherize = require('./utils/dasherize');
  * @property {Object} element.props
  */
 
-module.exports = {
-    /**
-     * @param {ReactElement} element
-     * @param {ICache} [cache]
-     * @returns {String} html
-     */
-    elementToString: function (element, cache) {
-        return renderElement(element, {
-            cache: cache,
-            context: {}
-        });
-    }
-};
-
 /**
- * @param {RenderElement} element
+ * @param {ReactElement} element
  * @param {Object} [options]
- * @param {ICache} [options.cache] Cache instance.
- * @param {Object} [options.context] Render context.
+ * @param {ICache} [options.cache]
+ * @param {Object} [options.context]
  * @returns {String} html
  */
 function renderElement(element, options) {
-    var Type = element.type;
+    var type = element.type;
+    var props = element.props || {};
 
-    var props = element.props;
-    var children = [].concat(props.children);
-
-    if (typeof Type === 'string') {
+    if (typeof type === 'string') {
         var content = '';
         if (props.dangerouslySetInnerHTML) {
             content = props.dangerouslySetInnerHTML.__html;
-        } else if (children.length > 0) {
-            content = renderChildren(children, options);
+        } else if (props.children) {
+            content = renderChildren([].concat(props.children), options);
         }
 
-        return '<' + Type + renderAttrs(props) + '>' + content + '</' + Type + '>';
-    } else if (typeof Type === 'function') {
-        var instance = new element.Type(props, options.context);
-
-        var context = options.context;
-        if (typeof instance.getChildContext === 'function') {
-            context = extend(context, instance.getChildContext());
-        }
-
-        return renderElement(instance.render(), extend(options, {context: context}));
+        return '<' + type + renderAttrs(props) + '>' + content + '</' + type + '>';
+    } else if (typeof type === 'function') {
+        return renderComponent(type, props, options);
     }
 
     return '';
+}
+
+/**
+ * @param {Function} Component
+ * @param {Object} props
+ * @param {Object} [options]
+ * @param {ICache} [options.cache]
+ * @param {Object} [options.context]
+ * @returns {String} html
+ */
+function renderComponent(Component, props, options) {
+    var context = (options && options.context) || {};
+    var instance = new Component(props, context);
+
+    var hasCache = typeof instance.getCacheKey === 'function';
+    if (hasCache) {
+        Component._renderCachePrefix = Component._renderCachePrefix || Component.displayName || uuid.v1();
+    }
+
+    var cache = options.cache;
+    var cacheKey = cache && hasCache ? Component._renderCachePrefix + instance.getCacheKey() : null;
+
+    if (cacheKey && cache.has(cacheKey)) {
+        return cache.get(cacheKey);
+    }
+
+    if (typeof instance.getChildContext === 'function') {
+        context = extend(context, instance.getChildContext());
+    }
+
+    var html = renderElement(instance.render(), extend(options, {context: context}));
+
+    if (cacheKey) {
+        cache.set(cacheKey, html);
+    }
+
+    return html;
 }
 
 /**
@@ -134,3 +150,7 @@ function renderStyle(style) {
     }
     return str;
 }
+
+module.exports = {
+    elementToString: renderElement
+};

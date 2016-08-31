@@ -18,8 +18,17 @@ npm install react-server-rendering
 var ReactRender = require('fast-react-render');
 
 var element = React.createElement(Component, {property: 'value'});
-console.log(ReactRender.elementToString(element));
+console.log(ReactRender.elementToString(element, {context: {}}));
 ```
+
+## Cache
+
+React server rendering support cache for component.
+
+First of all, you must choose cache system. It can be any system, which implement ICache interface ([interface](src/interfaces/i-cache.js)).
+For caching, component must implement ICacheableComponent interface ([interface](src/interfaces/i-cacheable-component.js)).
+
+Example with using LRU cache: [render with LRU cache](examples/cache.js) (install `lru-cache` package first).
 
 ## What's next
 
