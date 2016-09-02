@@ -1,6 +1,8 @@
 var ATTRS_TYPES = ['string', 'boolean', 'number'];
-var SELF_CLOSING_TAGS = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
-    'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+var SELF_CLOSING_TAGS = [
+    'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
+    'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
+];
 
 var uuid = require('uuid');
 
