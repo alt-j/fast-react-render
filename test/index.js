@@ -100,6 +100,17 @@ describe('ReactRender', function () {
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
+        it('should render stateless functions correctly', function () {
+            var element = React.createElement(
+                function (props) {
+                    return React.createElement('div', null, props.name);
+                },
+                {name: 'func'}
+            );
+            var expectString = '<div>func</div>';
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
         it('should render simple component correctly', function () {
             var Component = React.createClass({
                 render: function () {

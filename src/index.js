@@ -43,7 +43,11 @@ function renderElement(element, options) {
 
         return '<' + type + attrs + '>' + content + '</' + type + '>';
     } else if (typeof type === 'function') {
-        return renderComponent(type, props, options);
+        if (typeof type.prototype.render === 'function') {
+            return renderComponent(type, props, options);
+        } else {
+            return renderElement(type(props));
+        }
     }
 
     return '';
