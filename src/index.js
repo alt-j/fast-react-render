@@ -1,4 +1,6 @@
 var ATTRS_TYPES = ['string', 'boolean', 'number'];
+var SELF_CLOSING_TAGS = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
+    'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
 
 var uuid = require('uuid');
 
@@ -24,7 +26,7 @@ var dasherize = require('./utils/dasherize');
  */
 function renderElement(element, options) {
     var type = element.type;
-    var props = element.props || {};
+    var props = element.props;
 
     if (typeof type === 'string') {
         var content = '';
@@ -34,7 +36,12 @@ function renderElement(element, options) {
             content = renderChildren([].concat(props.children), options);
         }
 
-        return '<' + type + renderAttrs(props) + '>' + content + '</' + type + '>';
+        var attrs = renderAttrs(props);
+        if (SELF_CLOSING_TAGS.indexOf(type) !== -1) {
+            return '<' + type + attrs + ' />' + content;
+        }
+
+        return '<' + type + attrs + '>' + content + '</' + type + '>';
     } else if (typeof type === 'function') {
         return renderComponent(type, props, options);
     }

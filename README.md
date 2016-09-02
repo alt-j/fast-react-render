@@ -1,4 +1,4 @@
-# [React] Server render [![Build Status](https://travis-ci.org/alt-j/fast-react-render.svg?branch=master)](https://travis-ci.org/alt-j/fast-react-render)
+# [React] Server render [![Build Status](https://travis-ci.org/alt-j/fast-react-render.svg?branch=master)](https://travis-ci.org/alt-j/fast-react-render) [![Coverage Status](https://coveralls.io/repos/github/alt-j/fast-react-render/badge.svg?branch=master)](https://coveralls.io/github/alt-j/fast-react-render?branch=master)
 
 The module for rendering react-element in the server **3 times as fast** (see [benchmarks](https://github.com/alt-j/react-server-benchmark)) as [traditional react rendering](https://facebook.github.io/react/docs/environments.html) (in production mode).
 
