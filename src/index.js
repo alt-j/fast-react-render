@@ -11,6 +11,8 @@ var escapeAttr = require('./utils/escape/attr');
 
 var dasherize = require('./utils/dasherize');
 
+var hasPrefixes = require('./utils/has-prefixes');
+
 /**
  * @typedef {Object} RenderElement
  * @property {Function|String} element.type
@@ -126,7 +128,9 @@ function renderAttrs(attrs) {
     for (var key in attrs) {
         var value = key === 'style' ? renderStyle(attrs[key]) : attrs[key];
 
-        if (!value ||
+        var isAsIsRenderAttr = hasPrefixes(key, ['data-', 'aria-']);
+
+        if (!value && !isAsIsRenderAttr ||
             key === 'children' || key === 'key' ||
             ATTRS_TYPES.indexOf(typeof value) === -1
         ) {
@@ -142,7 +146,7 @@ function renderAttrs(attrs) {
 
         str += ' ' + attr;
 
-        if (typeof value !== 'boolean') {
+        if (typeof value !== 'boolean' || isAsIsRenderAttr) {
             str += '="' + (typeof value === 'string' ? escapeAttr(value) : value) + '"';
         }
     }

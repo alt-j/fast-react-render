@@ -28,10 +28,27 @@ describe('ReactRender', function () {
                 className: 'link',
                 id: 'link-1',
                 target: '_blank',
-                title: 'Link will be open in new tab'
+                title: 'Link will be open in new tab',
+                'data-custom': 1,
+                'data-boolean': true,
+                'aria-label': 'label',
+                'aria-hidden': false
             }, 'Test link');
-            var expectString = '<a href="//ya.ru" class="link" id="link-1" ' +
-                'target="_blank" title="Link will be open in new tab">Test link</a>';
+            var expectString = (
+                '<a' +
+                ' href="//ya.ru"' +
+                ' class="link"' +
+                ' id="link-1"' +
+                ' target="_blank"' +
+                ' title="Link will be open in new tab"' +
+                ' data-custom="1"' +
+                ' data-boolean="true"' +
+                ' aria-label="label"' +
+                ' aria-hidden="false"' +
+                '>' +
+                'Test link' +
+                '</a>'
+            );
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
@@ -95,8 +112,12 @@ describe('ReactRender', function () {
                 React.createElement('label', {htmlFor: 'pass'}, 'Password label'),
                 React.createElement('input', {type: 'password', id: 'pass'})
             );
-            var expectString = '<div class="password"><label for="pass">Password label</label>' +
-                '<input type="password" id="pass" /></div>';
+            var expectString = (
+                '<div class="password">' +
+                '<label for="pass">Password label</label>' +
+                '<input type="password" id="pass" />' +
+                '</div>'
+            );
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
@@ -151,11 +172,13 @@ describe('ReactRender', function () {
                 }
             });
             var element = React.createElement(Component, {items: ['a', 'b']});
-            var expectString = '<div class="list">' +
+            var expectString = (
+                '<div class="list">' +
                 'Items: 2' +
                 '<div class="item">a</div>' +
                 '<div class="item">b</div>' +
-                '</div>';
+                '</div>'
+            );
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
@@ -188,10 +211,12 @@ describe('ReactRender', function () {
                 }
             });
             var element = React.createElement(Component, {items: [['a', 'b'], ['c']]});
-            var expectString = '<div class="list">' +
+            var expectString = (
+                '<div class="list">' +
                 '<div class="item">Subtitle0<span>a</span><span>b</span></div>' +
                 '<div class="item">Subtitle1<span>c</span></div>' +
-                '</div>';
+                '</div>'
+            );
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
