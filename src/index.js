@@ -85,6 +85,10 @@ function renderComponent(Component, props, options) {
         context = extend(context, instance.getChildContext());
     }
 
+    if (typeof instance.componentWillMount === 'function') {
+        instance.componentWillMount();
+    }
+
     var html = renderElement(instance.render(), extend(options, {context: context}));
 
     if (cacheKey) {
@@ -110,7 +114,7 @@ function renderChildren(children, options) {
             str += escapeHtml(child);
         } else if (Array.isArray(child)) {
             str += renderChildren(child, options);
-        } else if (typeof child === 'object') {
+        } else if (typeof child === 'object' && child) {
             str += renderElement(child, options);
         } else if (typeof child === 'number') {
             str += child;

@@ -32,4 +32,4 @@ Example with using LRU cache: [render with LRU cache](examples/cache.js) (instal
 
 ## What's next
 
-If you need more perfomance, you can try use [fast-react-server](https://github.com/alt-j/fast-react-server) - is high speed mock for react, which provide rendering **15 times as fast** as traditional, but require more configuration for build system.
+If you need more performance, you can try use [fast-react-server](https://github.com/alt-j/fast-react-server) - is high speed mock for react, which provide rendering **15 times as fast** as traditional, but require more configuration for build system.
