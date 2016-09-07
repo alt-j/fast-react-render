@@ -1,4 +1,5 @@
 var ATTRS_TYPES = ['string', 'boolean', 'number'];
+
 var SELF_CLOSING_TAGS = [
     'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
     'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
@@ -33,19 +34,7 @@ function renderElement(element, options) {
     var props = element.props;
 
     if (typeof type === 'string') {
-        var content = '';
-        if (props.dangerouslySetInnerHTML) {
-            content = props.dangerouslySetInnerHTML.__html;
-        } else if (props.children) {
-            content = renderChildren([].concat(props.children), options);
-        }
-
-        var attrs = renderAttrs(props);
-        if (SELF_CLOSING_TAGS.indexOf(type) !== -1) {
-            return '<' + type + attrs + ' />' + content;
-        }
-
-        return '<' + type + attrs + '>' + content + '</' + type + '>';
+        return renderNativeComponent(type, props, options);
     } else if (typeof type === 'function') {
         if (typeof type.prototype.render === 'function') {
             return renderComponent(type, props, options);
@@ -55,6 +44,40 @@ function renderElement(element, options) {
     }
 
     return '';
+}
+
+/**
+ * @param {String} type
+ * @param {Object} props
+ * @param {Object} [options]
+ * @param {ICache} [options.cache]
+ * @param {Object} [options.context]
+ * @returns {String} html
+ */
+function renderNativeComponent(type, originalProps, options) {
+    var props = extend(originalProps);
+
+    var content = '';
+    if (type === 'textarea') {
+        content = renderChildren([props.value], options);
+        delete props.value;
+    } else if (props.dangerouslySetInnerHTML) {
+        content = props.dangerouslySetInnerHTML.__html;
+    } else if (props.children) {
+        if (type === 'select') {
+            content = renderSelect(props, options);
+        } else {
+            content = renderChildren([].concat(props.children), options);
+        }
+    }
+
+    var attrs = renderAttrs(props);
+
+    if (SELF_CLOSING_TAGS.indexOf(type) !== -1) {
+        return '<' + type + attrs + ' />' + content;
+    }
+
+    return '<' + type + attrs + '>' + content + '</' + type + '>';
 }
 
 /**
@@ -99,6 +122,58 @@ function renderComponent(Component, props, options) {
 }
 
 /**
+ * @param {Object} props
+ * @param {Object} [options]
+ * @param {ICache} [options.cache]
+ * @param {Object} [options.context]
+ * @returns {String} html
+ */
+function renderSelect(props, options) {
+    var value = props.value || props.defaultValue;
+
+    var i = value.length;
+    while (i--) {
+        value[i] = value[i].toString();
+    }
+
+    var children = markSelectChildren(props.children, !props.multiple ? [value] : value);
+
+    delete props.defaultValue;
+    delete props.value;
+
+    return renderChildren(children, options);
+}
+
+/**
+ * @param {RenderElement[]} originalChildren
+ * @param {String[]} values
+ * @returns {RenderElement} children
+ */
+function markSelectChildren(originalChildren, values) {
+    var children = [].concat(originalChildren);
+
+    var i = children.length;
+    while (i--) {
+        var type = children[i].type;
+        var props = children[i].props;
+
+        var patch = null;
+        if (type === 'option' && values.indexOf(props.value.toString()) !== -1) {
+            patch = {selected: true};
+        }
+        if (type === 'optgroup' && Array.isArray(props.children)) {
+            patch = {children: markSelectChildren(props.children, values)};
+        }
+
+        if (patch) {
+            children[i] = extend(children[i], {props: extend(props, patch)});
+        }
+    }
+
+    return children;
+}
+
+/**
  * @param {String[]|String[][]|Number[]|Number[][]} children
  * @param {Object} [options]
  * @param {ICache} [options.cache] Cache instance.
@@ -110,11 +185,15 @@ function renderChildren(children, options) {
 
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
+        if (!child) {
+            continue;
+        }
+
         if (typeof child === 'string') {
             str += escapeHtml(child);
         } else if (Array.isArray(child)) {
             str += renderChildren(child, options);
-        } else if (typeof child === 'object' && child) {
+        } else if (typeof child === 'object') {
             str += renderElement(child, options);
         } else if (typeof child === 'number') {
             str += child;

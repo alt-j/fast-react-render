@@ -59,6 +59,12 @@ describe('ReactRender', function () {
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
+        it('should render tag with null children correctly', function () {
+            var element = React.createElement('div', {children: [null]});
+            var expectString = '<div></div>';
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
         it('should render tag with dangerouse html correctly', function () {
             var element = React.createElement('div', {
                 dangerouslySetInnerHTML: {__html: '<b>Bold</b>'}
@@ -117,6 +123,74 @@ describe('ReactRender', function () {
                 '<label for="pass">Password label</label>' +
                 '<input type="password" id="pass" />' +
                 '</div>'
+            );
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
+        it('should render textarea correctly', function () {
+            var element = React.createElement('textarea', {value: 'text<br />'});
+            var expectString = '<textarea>text&lt;br /&gt;</textarea>';
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
+        it('should render select correctly', function () {
+            var element = React.createElement(
+                'select',
+                {value: '2'},
+                React.createElement('option', {value: 1}),
+                React.createElement('option', {value: 2})
+            );
+            var expectString = (
+                '<select>' +
+                '<option value="1"></option>' +
+                '<option value="2" selected></option>' +
+                '</select>'
+            );
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
+        it('should render multiple select correctly', function () {
+            var element = React.createElement(
+                'select',
+                {
+                    value: ['1', '2'],
+                    multiple: true
+                },
+                React.createElement('option', {value: 1}),
+                React.createElement('option', {value: 2})
+            );
+            var expectString = (
+                '<select multiple>' +
+                '<option value="1" selected></option>' +
+                '<option value="2" selected></option>' +
+                '</select>'
+            );
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
+        it('should render optgroup in select correctly', function () {
+            var element = React.createElement(
+                'select',
+                {
+                    value: ['1', '3'],
+                    multiple: true
+                },
+                React.createElement(
+                    'optgroup',
+                    {label: 'group'},
+                    React.createElement('option', {value: 1}),
+                    React.createElement('option', {value: 2})
+                ),
+                React.createElement('option', {value: 3})
+            );
+            var expectString = (
+                '<select multiple>' +
+                '<optgroup label="group">' +
+                '<option value="1" selected></option>' +
+                '<option value="2"></option>' +
+                '</optgroup>' +
+                '<option value="3" selected></option>' +
+                '</select>'
             );
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
@@ -265,6 +339,22 @@ describe('ReactRender', function () {
             var element = React.createElement(Component);
             var expectString = '<span class="name">Name: Aeron</span>';
             expect(ReactRender.elementToString(element, {context: {name: 'Aeron'}})).to.equal(expectString);
+        });
+
+        it('should execute componentWillMount method before rendering', function () {
+            var Component = React.createClass({
+                componentWillMount: function () {
+                    this._content = 'text';
+                },
+
+                render: function () {
+                    return React.createElement('span', null, this._content);
+                }
+            });
+
+            var element = React.createElement(Component);
+            var expectString = '<span>text</span>';
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
         it('should render from cache correctly', function () {
