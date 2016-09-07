@@ -9,7 +9,7 @@ All you need to use it, is only:
 1) install package
 
 ```sh
-npm install react-server-rendering
+npm install fast-react-render
 ```
 
 2) replace you render to:
@@ -32,4 +32,4 @@ Example with using LRU cache: [render with LRU cache](examples/cache.js) (instal
 
 ## What's next
 
-If you need more performance, you can try use [fast-react-server](https://github.com/alt-j/fast-react-server) - is high speed mock for react, which provide rendering **15 times as fast** as traditional, but require more configuration for build system.
+If you need more performance, you can try use [fast-react-server](https://github.com/alt-j/fast-react-server) - is high speed mock for react, which provide rendering **11 times as fast** as traditional, but require more configuration for build system.
