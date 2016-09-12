@@ -67,7 +67,10 @@ function renderNativeComponent(type, originalProps, options) {
         if (type === 'select') {
             content = renderSelect(props, options);
         } else {
-            content = renderChildren([].concat(props.children), options);
+            content = renderChildren(
+                Array.isArray(props.children) ? props.children : [].concat(props.children),
+                options
+            );
         }
     }
 
@@ -211,9 +214,12 @@ function renderAttrs(attrs) {
     for (var key in attrs) {
         var value = key === 'style' ? renderStyle(attrs[key]) : attrs[key];
 
-        var isAsIsRenderAttr = hasPrefixes(key, ['data-', 'aria-']);
+        var isAsIsRenderAttr = false;
+        if (typeof value === 'boolean') {
+            isAsIsRenderAttr = hasPrefixes(key, ['data-', 'aria-']);
+        }
 
-        if (!value && !isAsIsRenderAttr ||
+        if (value === false && !isAsIsRenderAttr ||
             key === 'children' || key === 'key' ||
             ATTRS_TYPES.indexOf(typeof value) === -1
         ) {
