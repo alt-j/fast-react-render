@@ -146,10 +146,10 @@ describe('ReactRender', function () {
         });
 
         it('should render select correctly with string value', function () {
-            var element = React.createElement('select', {value: 1},
+            var element = React.createElement('select', {value: '1'},
                 React.createElement('option', {value: 1})
             );
-            var expectString = '<select><option value="1"></option></select>';
+            var expectString = '<select><option value="1" selected></option></select>';
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
