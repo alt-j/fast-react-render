@@ -112,9 +112,7 @@ describe('ReactRender', function () {
         });
 
         it('should render complex element correctly', function () {
-            var element = React.createElement(
-                'div',
-                {className: 'password'},
+            var element = React.createElement('div', {className: 'password'},
                 React.createElement('label', {htmlFor: 'pass'}, 'Password label'),
                 React.createElement('input', {type: 'password', id: 'pass'})
             );
@@ -134,18 +132,24 @@ describe('ReactRender', function () {
         });
 
         it('should render select correctly', function () {
-            var element = React.createElement(
-                'select',
-                {value: '2'},
-                React.createElement('option', {value: 1}),
-                React.createElement('option', {value: 2})
+            var element = React.createElement('select', {value: 2},
+                React.createElement('option', {value: 1}, 'text 1'),
+                React.createElement('option', {value: 2}, 'text 2')
             );
             var expectString = (
                 '<select>' +
-                '<option value="1"></option>' +
-                '<option value="2" selected></option>' +
+                '<option value="1">text 1</option>' +
+                '<option value="2" selected>text 2</option>' +
                 '</select>'
             );
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
+        it('should render select correctly with string value', function () {
+            var element = React.createElement('select', {value: 1},
+                React.createElement('option', {value: 1})
+            );
+            var expectString = '<select><option value="1"></option></select>';
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 

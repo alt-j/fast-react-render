@@ -130,13 +130,14 @@ function renderComponent(Component, props, options) {
  */
 function renderSelect(props, options) {
     var value = props.value || props.defaultValue;
+    value = !props.multiple ? [value] : value;
 
     var i = value.length;
     while (i--) {
         value[i] = value[i].toString();
     }
 
-    var children = markSelectChildren(props.children, !props.multiple ? [value] : value);
+    var children = markSelectChildren(props.children, value);
 
     delete props.defaultValue;
     delete props.value;
