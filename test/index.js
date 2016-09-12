@@ -59,9 +59,15 @@ describe('ReactRender', function () {
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 
-        it('should render tag with null children correctly', function () {
+        it('should render tag with null child correctly', function () {
             var element = React.createElement('div', {children: [null]});
             var expectString = '<div></div>';
+            expect(ReactRender.elementToString(element)).to.equal(expectString);
+        });
+
+        it('should render tag with `0` as child correctly', function () {
+            var element = React.createElement('div', null, 0);
+            var expectString = '<div>0</div>';
             expect(ReactRender.elementToString(element)).to.equal(expectString);
         });
 

@@ -63,7 +63,7 @@ function renderNativeComponent(type, originalProps, options) {
         delete props.value;
     } else if (props.dangerouslySetInnerHTML) {
         content = props.dangerouslySetInnerHTML.__html;
-    } else if (props.children) {
+    } else if (typeof props.children !== 'undefined') {
         if (type === 'select') {
             content = renderSelect(props, options);
         } else {
@@ -186,15 +186,12 @@ function renderChildren(children, options) {
 
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
-        if (!child) {
-            continue;
-        }
 
         if (typeof child === 'string') {
             str += escapeHtml(child);
         } else if (Array.isArray(child)) {
             str += renderChildren(child, options);
-        } else if (typeof child === 'object') {
+        } else if (typeof child === 'object' && child) {
             str += renderElement(child, options);
         } else if (typeof child === 'number') {
             str += child;
