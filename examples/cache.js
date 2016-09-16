@@ -1,5 +1,6 @@
-// You must install all dependencies (react, lru-cache).
+/* eslint-disable no-console */
 
+// You must install all dependencies (react, lru-cache).
 var React = require('react');
 var ReactRender = require('../src/index');
 
