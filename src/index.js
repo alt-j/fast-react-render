@@ -1,9 +1,5 @@
-var ATTRS_TYPES = ['string', 'boolean', 'number'];
-
-var SELF_CLOSING_TAGS = [
-    'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
-    'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
-];
+var ATTRS_TYPES = require('./consts/allowed-attr-types');
+var SELF_CLOSING_TAGS = require('./consts/self-closing-tag');
 
 var uuid = require('uuid');
 
@@ -15,6 +11,7 @@ var escapeAttr = require('./utils/escape/attr');
 var dasherize = require('./utils/dasherize');
 
 var hasPrefixes = require('./utils/has-prefixes');
+var isContain = require('./utils/is-contain');
 
 /**
  * @typedef {Object} RenderElement
@@ -54,13 +51,10 @@ function renderElement(element, options) {
  * @param {Object} [options.context]
  * @returns {String} html
  */
-function renderNativeComponent(type, originalProps, options) {
-    var props = extend(originalProps);
-
+function renderNativeComponent(type, props, options) {
     var content = '';
     if (type === 'textarea') {
         content = renderChildren([props.value], options);
-        delete props.value;
     } else if (props.dangerouslySetInnerHTML) {
         content = props.dangerouslySetInnerHTML.__html;
     } else if (typeof props.children !== 'undefined') {
@@ -74,9 +68,9 @@ function renderNativeComponent(type, originalProps, options) {
         }
     }
 
-    var attrs = renderAttrs(props);
+    var attrs = renderAttrs(type, props);
 
-    if (SELF_CLOSING_TAGS.indexOf(type) !== -1) {
+    if (isContain(SELF_CLOSING_TAGS, type)) {
         return '<' + type + attrs + ' />' + content;
     }
 
@@ -139,13 +133,7 @@ function renderSelect(props, options) {
     while (i--) {
         value[i] = value[i].toString();
     }
-
-    var children = markSelectChildren(props.children, value);
-
-    delete props.defaultValue;
-    delete props.value;
-
-    return renderChildren(children, options);
+    return renderChildren(markSelectChildren(props.children, value), options);
 }
 
 /**
@@ -162,7 +150,7 @@ function markSelectChildren(originalChildren, values) {
         var props = children[i].props;
 
         var patch = null;
-        if (type === 'option' && values.indexOf(props.value.toString()) !== -1) {
+        if (type === 'option' && isContain(values, props.value.toString())) {
             patch = {selected: true};
         }
         if (type === 'optgroup' && Array.isArray(props.children)) {
@@ -208,7 +196,7 @@ function renderChildren(children, options) {
  * @param {Object} attrs
  * @returns {String} str
  */
-function renderAttrs(attrs) {
+function renderAttrs(tag, attrs) {
     var str = '';
 
     for (var key in attrs) {
@@ -216,12 +204,11 @@ function renderAttrs(attrs) {
 
         var isAsIsRenderAttr = false;
         if (typeof value === 'boolean') {
-            isAsIsRenderAttr = hasPrefixes(key, ['data-', 'aria-']);
+            isAsIsRenderAttr = hasPrefixes(['data-', 'aria-'], key);
         }
 
         if (value === false && !isAsIsRenderAttr ||
-            key === 'children' || key === 'key' ||
-            ATTRS_TYPES.indexOf(typeof value) === -1
+            shouldIgnoreAttr(tag, key) || !isContain(ATTRS_TYPES, typeof value)
         ) {
             continue;
         }
@@ -253,6 +240,25 @@ function renderStyle(style) {
         str += dasherize(property) + ': ' + style[property] + ';';
     }
     return str;
+}
+
+/**
+ * @param {String} tag
+ * @param {Object} attr
+ * @returns {Boolean} shouldIgnore
+ */
+function shouldIgnoreAttr(tag, attr) {
+    if (attr === 'key' || attr === 'children') {
+        return true;
+    }
+
+    if (tag === 'textarea') {
+        return attr === 'value';
+    } else if (tag === 'select') {
+        return attr === 'value' || attr === 'defaultValue';
+    }
+
+    return false;
 }
 
 module.exports = {

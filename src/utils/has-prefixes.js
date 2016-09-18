@@ -3,7 +3,7 @@
  * @param {String[]} prefixes
  * @returns {Boolean} hasPrefixes
  */
-module.exports = function (str, prefixes) {
+module.exports = function (prefixes, str) {
     var i = prefixes.length;
     while (--i >= 0) {
         var j = prefixes[i].length;
