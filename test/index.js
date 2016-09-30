@@ -12,6 +12,10 @@ describe('ReactRender', function () {
         });
 
         it('should render null correctly', function () {
+            expect(ReactRender.elementToString(null)).to.equal('');
+        });
+
+        it('should render null element correctly', function () {
             var element = React.createElement(null);
             expect(ReactRender.elementToString(element)).to.equal('');
         });

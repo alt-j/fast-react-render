@@ -20,13 +20,17 @@ var isContain = require('./utils/is-contain');
  */
 
 /**
- * @param {ReactElement} element
+ * @param {ReactElement} [element]
  * @param {Object} [options]
  * @param {ICache} [options.cache]
  * @param {Object} [options.context]
  * @returns {String} html
  */
 function renderElement(element, options) {
+    if (!element) {
+        return '';
+    }
+
     var type = element.type;
     var props = element.props;
 
