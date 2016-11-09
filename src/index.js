@@ -1,5 +1,6 @@
 var ATTRS_TYPES = require('./consts/allowed-attr-types');
 var SELF_CLOSING_TAGS = require('./consts/self-closing-tag');
+var LIFE_CYCLE_METHODS = require('./consts/life-cycle-methods');
 
 var uuid = require('uuid');
 
@@ -24,6 +25,7 @@ var isContain = require('./utils/is-contain');
  * @param {Object} [options]
  * @param {ICache} [options.cache]
  * @param {Object} [options.context]
+ * @param {Boolean} [options.shouldAutobind=false]
  * @returns {String} html
  */
 function renderElement(element, options) {
@@ -87,6 +89,7 @@ function renderNativeComponent(type, props, options) {
  * @param {Object} [options]
  * @param {ICache} [options.cache]
  * @param {Object} [options.context]
+ * @param {Boolean} [options.shouldAutobind=false]
  * @returns {String} html
  */
 function renderComponent(Component, props, options) {
@@ -107,6 +110,14 @@ function renderComponent(Component, props, options) {
 
     if (typeof instance.getChildContext === 'function') {
         context = extend(context, instance.getChildContext());
+    }
+
+    if (options && options.shouldAutobind) {
+        for (var key in instance) {
+            if (typeof instance[key] === 'function' && !isContain(LIFE_CYCLE_METHODS, key)) {
+                instance[key] = instance[key].bind(instance);
+            }
+        }
     }
 
     if (typeof instance.componentWillMount === 'function') {
