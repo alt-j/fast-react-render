@@ -42,7 +42,10 @@ function renderElement(element, options) {
         if (typeof type.prototype.render === 'function') {
             return renderComponent(type, props, options);
         } else {
-            return renderElement(type(props, (options && options.context) || {}));
+            return renderElement(
+                type(props, (options && options.context) || {}),
+                options && options.context ? {context: options.context} : null
+            );
         }
     }
 
