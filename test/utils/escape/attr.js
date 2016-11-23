@@ -16,7 +16,19 @@ describe('attr', function () {
         expect(attr('&')).to.equal('&amp;');
     });
 
+    it('should escape `&` sign twice', function () {
+        expect(attr('a=1&b=2&c=3')).to.equal('a=1&amp;b=2&amp;c=3');
+    });
+
     it('should escape `"` sign', function () {
         expect(attr('"')).to.equal('&quot;');
+    });
+
+    it('should escape `"` sign twice', function () {
+        expect(attr('"test"')).to.equal('&quot;test&quot;');
+    });
+
+    it('should escape `"` and `&` signs', function () {
+        expect(attr('"rock&roll"')).to.equal('&quot;rock&amp;roll&quot;');
     });
 });
