@@ -366,6 +366,20 @@ describe('ReactRender', function () {
                 expect(ReactRender.elementToString(element, {context: {name: 'Aeron'}})).to.equal(expectString);
             });
 
+            it('should render functional component with passing context object correctly', function () {
+                var Component = function (props, context) {
+                    return React.createElement(
+                        'span',
+                        {className: 'name'},
+                        'Name: ' + context.name
+                    );
+                };
+
+                var element = React.createElement(Component);
+                var expectString = '<span class="name">Name: Aeron</span>';
+                expect(ReactRender.elementToString(element, {context: {name: 'Aeron'}})).to.equal(expectString);
+            });
+
             it('should execute componentWillMount method before rendering', function () {
                 var Component = React.createClass({
                     componentWillMount: function () {
