@@ -1,6 +1,6 @@
 {
   "name": "fast-react-render",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Fast tool for render react to string",
   "main": "src/index.js",
   "repository": {
