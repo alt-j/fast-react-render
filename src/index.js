@@ -39,7 +39,7 @@ function renderElement(element, options) {
     if (typeof type === 'string') {
         return renderNativeComponent(type, props, options);
     } else if (typeof type === 'function') {
-        if (typeof type.prototype.render === 'function') {
+        if (type.prototype && typeof type.prototype.render === 'function') {
             return renderComponent(type, props, options);
         } else {
             return renderElement(type(props, options && options.context || {}), options);
